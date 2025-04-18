@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import Startups from "./pages/Startups";
 import StartupDetail from "./pages/StartupDetail";
 import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 
 const queryClient = new QueryClient();
 
