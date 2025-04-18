@@ -1,20 +1,34 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { login, isAuthenticated } = useAuth();
+
+  // Redirect if already logged in
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Authentication will be implemented with Supabase integration
-    console.log("Sign in attempt", { email, password });
+    setIsLoading(true);
+    
+    try {
+      login(email, password);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,6 +52,7 @@ const SignIn = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -51,11 +66,13 @@ const SignIn = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -67,8 +84,8 @@ const SignIn = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
             <p className="text-sm text-center text-gray-600">
               Don't have an account?{" "}
