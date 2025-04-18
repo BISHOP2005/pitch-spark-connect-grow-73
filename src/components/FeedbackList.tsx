@@ -1,8 +1,9 @@
-
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, MessageCircle, Calendar } from "lucide-react";
+import { getDashboardData } from "@/utils/storage";
 
 interface FeedbackItemProps {
   id: string;
@@ -77,6 +78,17 @@ const FeedbackTypeBadge = ({ type }: { type: "positive" | "negative" | "neutral"
 };
 
 const FeedbackList = () => {
+  const [data, setData] = useState(getDashboardData());
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setData(getDashboardData());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
