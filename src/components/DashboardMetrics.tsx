@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, MessageSquare, ThumbsUp, TrendingUp, TrendingDown } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { getDashboardData } from "@/utils/storage";
-import PitchDialog from "./PitchDialog";
 
 // Sample data for charts
 const activityData = [
@@ -52,48 +50,40 @@ const MetricCard = ({ title, value, description, icon, trend, trendValue }: Metr
 );
 
 const DashboardMetrics = () => {
-  const [data, setData] = useState(getDashboardData());
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setData(getDashboardData());
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Dashboard Overview</h2>
-        <PitchDialog />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Total Pitch Views"
-          value={data.pitchViews}
+          value="1,248"
           description="from last month"
           icon={<Activity className="h-5 w-5 text-launchpad-blue" />}
+          trend="up"
+          trendValue="+12.5%"
         />
         <MetricCard
           title="Feedback Received"
-          value={data.feedbackCount}
-          description="from mentors"
+          value="36"
+          description="from 12 mentors"
           icon={<MessageSquare className="h-5 w-5 text-launchpad-indigo" />}
+          trend="up"
+          trendValue="+8.3%"
         />
         <MetricCard
           title="Engagement Score"
-          value={`${data.engagementScore}%`}
-          description="based on interactions"
+          value="85%"
+          description="based on 320 interactions"
           icon={<ThumbsUp className="h-5 w-5 text-launchpad-purple" />}
+          trend="up"
+          trendValue="+5.2%"
         />
         <MetricCard
           title="Active Mentors"
-          value={data.activeMentors}
-          description="across industries"
+          value="8"
+          description="across 5 industries"
           icon={<Users className="h-5 w-5 text-launchpad-orange" />}
+          trend="neutral"
+          trendValue=""
         />
       </div>
 

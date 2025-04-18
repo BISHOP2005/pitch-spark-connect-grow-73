@@ -2,12 +2,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, RocketIcon, BarChart, Users, MessageSquare, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { Menu, X, RocketIcon, BarChart, Users, MessageSquare } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -35,31 +33,9 @@ const Navbar = () => {
             <Link to="/dashboard" className="text-gray-700 hover:text-launchpad-purple transition-colors">
               Dashboard
             </Link>
-            
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-700">Hello, {user?.name?.split(' ')[0]}</span>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center" 
-                  onClick={logout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Link to="/signin">
-                  <Button variant="outline" className="mr-2">Sign In</Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="bg-launchpad-blue hover:bg-launchpad-indigo text-white">
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
+            <Button className="bg-launchpad-blue hover:bg-launchpad-indigo text-white">
+              Sign In
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,28 +66,9 @@ const Navbar = () => {
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Feedback
               </Link>
-              
-              {isAuthenticated ? (
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center" 
-                  onClick={logout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out ({user?.name?.split(' ')[0]})
-                </Button>
-              ) : (
-                <>
-                  <Link to="/signin">
-                    <Button variant="outline" className="w-full mb-2">Sign In</Button>
-                  </Link>
-                  <Link to="/signup">
-                    <Button className="bg-launchpad-blue hover:bg-launchpad-indigo text-white w-full">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </>
-              )}
+              <Button className="bg-launchpad-blue hover:bg-launchpad-indigo text-white w-full">
+                Sign In
+              </Button>
             </div>
           </div>
         )}
