@@ -1,7 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { ref, get, set, child } from "firebase/database";
+import { db } from "../firebaseConfig";
 
 interface User {
   id: string;
@@ -12,8 +13,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  signup: (name: string, email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -23,7 +24,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  // Load user from localStorage on initial render
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -31,30 +31,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const signup = (name: string, email: string, password: string): boolean => {
+  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      // Check if user already exists
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      if (users.some((u: any) => u.email === email)) {
+      const userRef = ref(db, "users");
+      const snapshot = await get(child(userRef, btoa(email)));
+
+      if (snapshot.exists()) {
         toast.error("Email already registered");
         return false;
       }
 
-      // Create new user
       const newUser = {
         id: Date.now().toString(),
         name,
-        email
+        email,
       };
 
-      // Store user in users array
-      users.push({ ...newUser, password });
-      localStorage.setItem("users", JSON.stringify(users));
+      await set(child(userRef, btoa(email)), {
+        ...newUser,
+        password,
+      });
 
-      // Set current user
       setUser(newUser);
       localStorage.setItem("user", JSON.stringify(newUser));
-      
+
       toast.success("Account created successfully");
       navigate("/dashboard");
       return true;
@@ -65,23 +65,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (email: string, password: string): boolean => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const foundUser = users.find((u: any) => u.email === email && u.password === password);
+      const userRef = ref(db, "users");
+      const snapshot = await get(child(userRef, btoa(email)));
 
-      if (!foundUser) {
+      if (!snapshot.exists()) {
         toast.error("Invalid email or password");
         return false;
       }
 
-      // Extract user data without password
-      const { password: _, ...userData } = foundUser;
-      
-      // Set user
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
-      
+      const userData = snapshot.val();
+
+      if (userData.password !== password) {
+        toast.error("Invalid email or password");
+        return false;
+      }
+
+      const { password: _, ...userWithoutPassword } = userData;
+
+      setUser(userWithoutPassword);
+      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+
       toast.success("Signed in successfully");
       navigate("/dashboard");
       return true;

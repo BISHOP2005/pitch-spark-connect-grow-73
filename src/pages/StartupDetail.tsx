@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React , {useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,74 +11,152 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Heart, Share2, MessageCircle, Users, Calendar, Globe, Building, ChevronRight, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import { db } from "@/firebaseConfig";
+import { ref, onValue } from "firebase/database";
+
+interface FeedbackItem {
+  id: string;
+  mentorName: string;
+  mentorAvatar: string;
+  mentorRole: string;
+  date: string;
+  message: string;
+  type: "positive" | "negative" | "neutral";
+}
+
+interface StartupItemProps {
+  id: number;
+  name: string;
+  logo: string;
+  description: string;
+  longDescription: string;
+  category: string;
+  foundedYear: string;
+  location: string;
+  teamSize: string;
+  website: string;
+  pitchDeck: {
+    title: string;
+    content: string;
+  }[];
+  feedback:{
+    [key: string]: FeedbackItem;
+  };
+  feedbackCount: number;
+  engagementScore: number;
+  mentorCount: number;
+}
 
 // Sample startup data
-const startups = [
-  {
-    id: "1",
-    name: "EcoTech Solutions",
-    logo: "/placeholder.svg",
-    description: "Revolutionizing renewable energy systems with AI-powered optimization for residential solar panels.",
-    longDescription: "EcoTech Solutions is developing an innovative AI-powered platform that optimizes renewable energy systems for residential properties. Our technology uses machine learning algorithms to analyze energy usage patterns, weather data, and grid conditions to maximize the efficiency of solar panel systems. By optimizing energy generation, storage, and consumption, we help homeowners reduce their carbon footprint while saving money on their energy bills.",
-    category: "CleanTech",
-    foundedYear: "2023",
-    location: "San Francisco, CA",
-    teamSize: "8",
-    website: "https://ecotechsolutions.example",
-    pitchDeck: [
-      {
-        title: "Problem",
-        content: "Traditional solar panel systems are inefficient, wasting up to 30% of potential energy generation. Homeowners struggle to maximize their renewable energy investment due to suboptimal system configuration and lack of real-time optimization."
-      },
-      {
-        title: "Solution",
-        content: "Our AI-powered platform continuously monitors and adjusts solar panel systems to maximize energy capture, storage utilization, and grid interaction, resulting in up to 40% improved efficiency."
-      },
-      {
-        title: "Market",
-        content: "The global residential solar market is projected to reach $184 billion by 2027, growing at 15% CAGR. Our initial target market of environmentally-conscious homeowners in the US represents a $42 billion opportunity."
-      },
-      {
-        title: "Business Model",
-        content: "We offer a SaaS subscription model at $15/month for basic optimization, with premium tiers for advanced features. We also receive revenue sharing from partner installation companies."
-      },
-      {
-        title: "Traction",
-        content: "We've completed a successful pilot with 50 homes, showing an average 27% improvement in energy efficiency. We have LOIs from 3 major solar installation companies and 200+ waitlisted customers."
-      },
-    ],
-    feedbackCount: 24,
-    engagementScore: 92,
-    mentorCount: 5,
-  },
-];
+// const startups = [
+//   {
+//     id: "1",
+//     name: "EcoTech Solutions",
+//     logo: "/placeholder.svg",
+//     description: "Revolutionizing renewable energy systems with AI-powered optimization for residential solar panels.",
+//     longDescription: "EcoTech Solutions is developing an innovative AI-powered platform that optimizes renewable energy systems for residential properties. Our technology uses machine learning algorithms to analyze energy usage patterns, weather data, and grid conditions to maximize the efficiency of solar panel systems. By optimizing energy generation, storage, and consumption, we help homeowners reduce their carbon footprint while saving money on their energy bills.",
+//     category: "CleanTech",
+//     foundedYear: "2023",
+//     location: "San Francisco, CA",
+//     teamSize: "8",
+//     website: "https://ecotechsolutions.example",
+//     pitchDeck: [
+//       {
+//         title: "Problem",
+//         content: "Traditional solar panel systems are inefficient, wasting up to 30% of potential energy generation. Homeowners struggle to maximize their renewable energy investment due to suboptimal system configuration and lack of real-time optimization."
+//       },
+//       {
+//         title: "Solution",
+//         content: "Our AI-powered platform continuously monitors and adjusts solar panel systems to maximize energy capture, storage utilization, and grid interaction, resulting in up to 40% improved efficiency."
+//       },
+//       {
+//         title: "Market",
+//         content: "The global residential solar market is projected to reach $184 billion by 2027, growing at 15% CAGR. Our initial target market of environmentally-conscious homeowners in the US represents a $42 billion opportunity."
+//       },
+//       {
+//         title: "Business Model",
+//         content: "We offer a SaaS subscription model at $15/month for basic optimization, with premium tiers for advanced features. We also receive revenue sharing from partner installation companies."
+//       },
+//       {
+//         title: "Traction",
+//         content: "We've completed a successful pilot with 50 homes, showing an average 27% improvement in energy efficiency. We have LOIs from 3 major solar installation companies and 200+ waitlisted customers."
+//       },
+//     ],
+//     feedbackCount: 24,
+//     engagementScore: 92,
+//     mentorCount: 5,
+//   },
+// ];
+const StartupList = () => {
+  const [startupItems, setstartupItems] = useState<StartupItemProps[]>([]);
 
-const StartupDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState("pitch");
-  const [feedbackText, setFeedbackText] = useState("");
-  
-  // Find the startup by ID
-  const startup = startups.find((s) => s.id === id);
-  
-  if (!startup) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 pt-24 pb-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl font-bold mb-4">Startup not found</h1>
-            <p className="mb-6">The startup you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/startups">Browse All Startups</Link>
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
+  useEffect(() => {
+    const startupRef = ref(db, "startups/");
+  
+    const unsubscribe = onValue(startupRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log("Firebase Data:", data);
+      if (data) {
+        const startupArray = Object.entries(data).map(([id, item]: any) => ({
+          id,
+          ...item,
+        }));
+        console.log("Parsed Array:", startupArray);
+        setstartupItems(startupArray);
+      } else {
+        setstartupItems([]);
+      }
+    });
+  
+    return () => unsubscribe(); // Cleanup listener
+  }, []);
+}
+
+  const StartupDetail = () => {
+    const { id } = useParams<{ id: string }>();
+    const [startupItems, setStartupItems] = useState<StartupItemProps[]>([]);
+    const [activeTab, setActiveTab] = useState("pitch");
+    const [feedbackText, setFeedbackText] = useState("");
+  
+    useEffect(() => {
+      const startupRef = ref(db, "startups/");
+      const unsubscribe = onValue(startupRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const startupArray = Object.entries(data).map(([key, item]: any) => ({
+            id: key,
+            ...item,
+          }));
+          setStartupItems(startupArray);
+        } else {
+          setStartupItems([]);
+        }
+      });
+      return () => unsubscribe();
+    }, []);
+  
+    // 🔍 Find startup by `id` from params
+    const startup = startupItems.find((s) => String(s.id) === id);
+ 
+  
+    if (!startup) {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-1 pt-24 pb-16">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-2xl font-bold mb-4">Startup not found</h1>
+              <p className="mb-6">The startup you're looking for doesn't exist or has been removed.</p>
+              <Button asChild>
+                <Link to="/startups">Browse All Startups</Link>
+              </Button>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

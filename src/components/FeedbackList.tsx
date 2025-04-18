@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, MessageCircle, Calendar } from "lucide-react";
 import { getDashboardData } from "@/utils/storage";
+import { ref, onValue } from "firebase/database";
+import { db } from "@/firebaseConfig"; // make sure db is properly exported from firebaseConfig.ts
+
 
 interface FeedbackItemProps {
   id: string;
@@ -15,35 +19,7 @@ interface FeedbackItemProps {
   type: "positive" | "negative" | "neutral";
 }
 
-const feedbackItems: FeedbackItemProps[] = [
-  {
-    id: "1",
-    mentorName: "Sarah Johnson",
-    mentorAvatar: "",
-    mentorRole: "Product Strategy",
-    date: "April 10, 2025",
-    message: "Your value proposition is clear and compelling. I especially like how you've identified the specific pain points in the market. Consider expanding on how your solution is different from existing alternatives.",
-    type: "positive",
-  },
-  {
-    id: "2",
-    mentorName: "Michael Chen",
-    mentorAvatar: "",
-    mentorRole: "Venture Capital",
-    date: "April 8, 2025",
-    message: "The financial projections need more work. I'm not convinced by the revenue assumptions, and the customer acquisition costs seem too optimistic. Let's discuss this in our next meeting.",
-    type: "negative",
-  },
-  {
-    id: "3",
-    mentorName: "Alex Rivera",
-    mentorAvatar: "",
-    mentorRole: "Marketing",
-    date: "April 5, 2025",
-    message: "Your go-to-market strategy has potential, but you need to define your target audience more clearly. The competitive analysis is good, though I'd like to see more about your positioning.",
-    type: "neutral",
-  },
-];
+
 
 const FeedbackTypeIcon = ({ type }: { type: "positive" | "negative" | "neutral" }) => {
   if (type === "positive") {
@@ -78,17 +54,30 @@ const FeedbackTypeBadge = ({ type }: { type: "positive" | "negative" | "neutral"
 };
 
 const FeedbackList = () => {
-  const [data, setData] = useState(getDashboardData());
+  const [feedbackItems, setFeedbackItems] = useState<FeedbackItemProps[]>([]);
+
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setData(getDashboardData());
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    const feedbackRef = ref(db, "startups/1/feedback");
+  
+    const unsubscribe = onValue(feedbackRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log("Firebase Data:", data);
+      if (data) {
+        const feedbackArray = Object.entries(data).map(([id, item]: any) => ({
+          id,
+          ...item,
+        }));
+        console.log("Parsed Array:", feedbackArray);
+        setFeedbackItems(feedbackArray);
+      } else {
+        setFeedbackItems([]);
+      }
+    });
+  
+    return () => unsubscribe(); // Cleanup listener
   }, []);
-
+ 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
