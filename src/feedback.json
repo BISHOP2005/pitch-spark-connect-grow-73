@@ -1,0 +1,67 @@
+{
+    "startups": {
+      "1": {
+        "name": "EcoTech Solutions",
+        "logo": "/placeholder.svg",
+        "description": "Revolutionizing renewable energy systems with AI-powered optimization for residential solar panels.",
+        "longDescription": "EcoTech Solutions is developing an innovative AI-powered platform that optimizes renewable energy systems for residential properties. Our technology uses machine learning algorithms to analyze energy usage patterns, weather data, and grid conditions to maximize the efficiency of solar panel systems. By optimizing energy generation, storage, and consumption, we help homeowners reduce their carbon footprint while saving money on their energy bills.",
+        "category": "CleanTech",
+        "foundedYear": "2023",
+        "location": "San Francisco, CA",
+        "teamSize": "8",
+        "website": "https://ecotechsolutions.example",
+        "pitchDeck": [
+          {
+            "title": "Problem",
+            "content": "Traditional solar panel systems are inefficient, wasting up to 30% of potential energy generation. Homeowners struggle to maximize their renewable energy investment due to suboptimal system configuration and lack of real-time optimization."
+          },
+          {
+            "title": "Solution",
+            "content": "Our AI-powered platform continuously monitors and adjusts solar panel systems to maximize energy capture, storage utilization, and grid interaction, resulting in up to 40% improved efficiency."
+          },
+          {
+            "title": "Market",
+            "content": "The global residential solar market is projected to reach $184 billion by 2027, growing at 15% CAGR. Our initial target market of environmentally-conscious homeowners in the US represents a $42 billion opportunity."
+          },
+          {
+            "title": "Business Model",
+            "content": "We offer a SaaS subscription model at $15/month for basic optimization, with premium tiers for advanced features. We also receive revenue sharing from partner installation companies."
+          },
+          {
+            "title": "Traction",
+            "content": "We've completed a successful pilot with 50 homes, showing an average 27% improvement in energy efficiency. We have LOIs from 3 major solar installation companies and 200+ waitlisted customers."
+          }
+        ],
+        "feedback": {
+          "f1": {
+            "mentorName": "Sarah Johnson",
+            "mentorAvatar": "",
+            "mentorRole": "Product Strategy",
+            "date": "April 10, 2025",
+            "message": "Your value proposition is clear and compelling. I especially like how you've identified the specific pain points in the market. Consider expanding on how your solution is different from existing alternatives.",
+            "type": "positive"
+          },
+          "f2": {
+            "mentorName": "Michael Chen",
+            "mentorAvatar": "",
+            "mentorRole": "Venture Capital",
+            "date": "April 8, 2025",
+            "message": "The financial projections need more work. I'm not convinced by the revenue assumptions, and the customer acquisition costs seem too optimistic. Let's discuss this in our next meeting.",
+            "type": "negative"
+          },
+          "f3": {
+            "mentorName": "Alex Rivera",
+            "mentorAvatar": "",
+            "mentorRole": "Marketing",
+            "date": "April 5, 2025",
+            "message": "Your go-to-market strategy has potential, but you need to define your target audience more clearly. The competitive analysis is good, though I'd like to see more about your positioning.",
+            "type": "neutral"
+          }
+        },
+        "feedbackCount": 24,
+        "engagementScore": 92,
+        "mentorCount": 5
+      }
+    }
+  }
+  
