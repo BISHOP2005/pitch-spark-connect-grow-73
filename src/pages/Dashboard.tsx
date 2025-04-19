@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DashboardMetrics from "@/components/DashboardMetrics";
@@ -6,17 +5,41 @@ import FeedbackList from "@/components/FeedbackList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, MessageSquare, Users, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Edit } from "lucide-react";
+import { getDashboardData } from "@/utils/storage";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const pitchData = getDashboardData().pitchData;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Monitor your startup performance and engagement</p>
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-gray-600">Monitor your startup performance and engagement</p>
+            </div>
+            <Button
+              onClick={() => navigate("/add-pitch")}
+              className="flex items-center gap-2"
+            >
+              {pitchData ? (
+                <>
+                  <Edit className="h-4 w-4" />
+                  Edit Pitch
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  Add Pitch
+                </>
+              )}
+            </Button>
           </div>
           
           <Tabs defaultValue="overview" className="space-y-6">

@@ -6,8 +6,20 @@ interface DashboardData {
   activeMentors: number;
   pitchData: {
     id: string;
-    title: string;
-    content: string;
+    category: string;
+    categoryDescription: string;
+    foundedYear: string;
+    location: string;
+    logo: string;
+    longDescription: string;
+    mentorCount: string;
+    startupName: string;
+    problemStatement: string;
+    solutionProposed: string;
+    marketValue: string;
+    businessModel: string;
+    traction: string;
+    websiteLink: string;
     createdAt: string;
     updatedAt: string;
   } | null;
