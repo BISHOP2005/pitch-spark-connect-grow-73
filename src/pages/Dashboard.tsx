@@ -8,6 +8,7 @@ import { BarChart, MessageSquare, Users, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit } from "lucide-react";
 import { getDashboardData } from "@/utils/storage";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const navigate = useNavigate();
